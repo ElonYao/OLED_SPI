@@ -1,0 +1,106 @@
+/**
+ * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
+ * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
+ * @cliArgs --device "F28003x" --part "F28003x_100PZ" --package "100PZ" --context "system" --product "C2000WARE@5.04.00.00"
+ * @v2CliArgs --device "TMS320F280039C" --package "100PZ" --context "system" --product "C2000WARE@5.04.00.00"
+ * @versions {"tool":"1.21.0+3721"}
+ */
+
+/**
+ * Import the modules used in this configuration.
+ */
+const gpio             = scripting.addModule("/driverlib/gpio.js", {}, false);
+const gpio1            = gpio.addInstance();
+const gpio2            = gpio.addInstance();
+const gpio3            = gpio.addInstance();
+const gpio4            = gpio.addInstance();
+const inputxbar_input  = scripting.addModule("/driverlib/inputxbar_input.js", {}, false);
+const inputxbar_input1 = inputxbar_input.addInstance();
+const inputxbar_input2 = inputxbar_input.addInstance();
+const spi              = scripting.addModule("/driverlib/spi.js", {}, false);
+const spi1             = spi.addInstance();
+const FREERTOS         = scripting.addModule("/kernel/freertos_tool/FREERTOS", {}, false);
+const FREERTOS1        = FREERTOS.addInstance();
+
+/**
+ * Write custom configuration values to the imported modules.
+ */
+gpio1.$name             = "DC_control";
+gpio1.direction         = "GPIO_DIR_MODE_OUT";
+gpio1.writeInitialValue = true;
+gpio1.gpioPin.$assign   = "GPIO37/TDO";
+
+gpio2.$name             = "Reset_control";
+gpio2.direction         = "GPIO_DIR_MODE_OUT";
+gpio2.writeInitialValue = true;
+gpio2.initialValue      = 1;
+gpio2.gpioPin.$assign   = "GPIO8";
+
+gpio3.$name                     = "R_ENC1";
+gpio3.padConfig                 = "PULLUP";
+gpio3.useInterrupt              = true;
+gpio3.gpioPin.$assign           = "GPIO25";
+gpio3.xint.intType              = "GPIO_INT_TYPE_BOTH_EDGES";
+gpio3.xint.enableInt            = true;
+gpio3.xint.registerInterrupts   = true;
+gpio3.xint.xInt.enableInterrupt = true;
+
+gpio4.$name                      = "R_ENC2";
+gpio4.padConfig                  = "PULLUP";
+gpio4.useInterrupt               = true;
+gpio4.gpioPin.$assign            = "GPIO26";
+gpio4.xint.xintNum               = "GPIO_INT_XINT2";
+gpio4.xint.intType               = "GPIO_INT_TYPE_BOTH_EDGES";
+gpio4.xint.enableInt             = true;
+gpio4.xint.registerInterrupts    = true;
+gpio4.xint.xInt.interruptHandler = "INT_R_ENC1_XINT_ISR";
+gpio4.xint.xInt.enableInterrupt  = true;
+
+inputxbar_input1.$name         = "myINPUTXBARINPUT0";
+gpio3.xint.inputxbar           = inputxbar_input1;
+inputxbar_input1.inputxbarGpio = "GPIO25";
+
+inputxbar_input2.$name         = "myINPUTXBARINPUT1";
+gpio4.xint.inputxbar           = inputxbar_input2;
+inputxbar_input2.inputxbarGpio = "GPIO26";
+
+spi1.$name                   = "OLED";
+spi1.mode                    = "SPI_MODE_CONTROLLER";
+spi1.emulationMode           = "SPI_EMULATION_FREE_RUN";
+spi1.dataWidth               = "8";
+spi1.bitRate                 = 4000000;
+spi1.txFifo                  = "SPI_FIFO_TX2";
+spi1.enabledFIFOInterrupts   = ["SPI_INT_TXFF"];
+spi1.registerInterrupts      = true;
+spi1.useInterrupts           = false;
+spi1.useFifo                 = false;
+spi1.transferProtocol        = "SPI_PROT_POL0PHA1";
+spi1.spi.spi_picoPin.$assign = "GPIO7";
+spi1.spi.spi_pociPin.$assign = "B11, GPIO21";
+spi1.spi.spi_clkPin.$assign  = "GPIO22";
+spi1.spi.spi_ptePin.$assign  = "GPIO23";
+spi1.picoQual.$name          = "myGPIOQUAL0";
+spi1.pociQual.$name          = "myGPIOQUAL1";
+spi1.clkQual.$name           = "myGPIOQUAL2";
+spi1.pteQual.$name           = "myGPIOQUAL3";
+
+FREERTOS1.$name                         = "myFREERTOS0";
+FREERTOS1.CPU_CLOCK_HZ                  = 120000000;
+FREERTOS1.IDLE_SHOULD_YIELD             = true;
+FREERTOS1.USE_MUTEXES                   = true;
+FREERTOS1.USE_RECURSIVE_MUTEXES         = true;
+FREERTOS1.USE_COUNTING_SEMAPHORES       = true;
+FREERTOS1.CHECK_FOR_STACK_OVERFLOW      = 2;
+FREERTOS1.USE_MALLOC_FAILED_HOOK        = true;
+FREERTOS1.vTaskDelete                   = true;
+FREERTOS1.ENABLE_BACKWARD_COMPATIBILITY = true;
+FREERTOS1.uxTaskGetStackHighWaterMark   = true;
+FREERTOS1.MINIMAL_STACK_SIZE            = 256;
+FREERTOS1.TOTAL_HEAP_SIZE               = 2048;
+
+/**
+ * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
+ * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
+ * re-solve from scratch.
+ */
+spi1.spi.$suggestSolution = "SPIB";
